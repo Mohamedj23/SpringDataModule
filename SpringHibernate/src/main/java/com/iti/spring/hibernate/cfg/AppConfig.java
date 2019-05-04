@@ -1,15 +1,12 @@
 package com.iti.spring.hibernate.cfg;
 
 
-import com.iti.spring.generic.model.dao.SellerDAO;
-import com.iti.spring.generic.model.dao.UserDAO;
-import com.iti.spring.hibernate.model.dao.impl.SellerDAOImpl;
-import com.iti.spring.hibernate.model.dao.impl.UserDAOImpl;
+import com.iti.spring.generic.model.dao.*;
+import com.iti.spring.hibernate.model.dao.impl.*;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -29,7 +26,7 @@ public class AppConfig {
     private Environment environment;
 
     @Bean(name = "dataSource")
-    public DataSource getDataSource(){
+    public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getProperty("jdbc.driverClassName"));
         dataSource.setUrl(environment.getProperty("jdbc.url"));
@@ -40,7 +37,7 @@ public class AppConfig {
     }
 
     @Bean
-    public LocalSessionFactoryBean getSessionFactory(){
+    public LocalSessionFactoryBean getSessionFactory() {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
         sessionFactoryBean.setDataSource(getDataSource());
         sessionFactoryBean.setPackagesToScan("com.iti.spring.generic.model.entity");
@@ -49,7 +46,7 @@ public class AppConfig {
     }
 
     @Bean
-    public HibernateTemplate getHibernateTemplate(SessionFactory sessionFactory){
+    public HibernateTemplate getHibernateTemplate(SessionFactory sessionFactory) {
 
         HibernateTemplate hibernateTemplate = new HibernateTemplate();
         hibernateTemplate.setSessionFactory(sessionFactory);
@@ -57,19 +54,45 @@ public class AppConfig {
     }
 
     @Bean
-    public HibernateTransactionManager getHibernateTransactionManager(SessionFactory sessionFactory){
+    public HibernateTransactionManager getHibernateTransactionManager(SessionFactory sessionFactory) {
         HibernateTransactionManager manager = new HibernateTransactionManager();
         manager.setSessionFactory(sessionFactory);
         return manager;
     }
 
     @Bean(name = "userDAO")
-    public UserDAO getUserDAO(){
+    public UserDAO getUserDAO() {
         return new UserDAOImpl();
     }
 
     @Bean
-    public SellerDAO getSellerDAO(){
+    public SellerDAO getSellerDAO() {
         return new SellerDAOImpl();
     }
+
+    @Bean
+    public ProductDAO productDAO() {
+        return new ProductDAOImpl();
+    }
+
+    @Bean
+    public CategoryDAO categoryDAO() {
+        return new CategoryDAOImpl();
+    }
+
+    @Bean
+    public BuyerDAO buyerDAO() {
+        return new BuyerDAOImpl();
+    }
+
+    @Bean
+    public BuyerBuyProductDAO buyerBuyProductDAO() {
+        return new BuyerBuyProductDAOImpl();
+    }
+
+    @Bean
+    public BuyerBidProductDAO buyerBidProductDAO() {
+        return new BuyerBidProductDAOImpl();
+    }
+
 }
