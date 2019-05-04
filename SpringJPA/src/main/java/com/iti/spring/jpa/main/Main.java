@@ -25,6 +25,9 @@ public class Main {
         user.setFullName("mohamedj23");
 
         User newUser = userService.retrieveUserByEmail("feras2@gmail.com");
-        System.out.println(newUser.getFullName());
+
+        userService.retrieveUsersByAddress("faisal").forEach(user1 -> {
+            System.out.println(user1.getFullName());
+        });
     }
 }
