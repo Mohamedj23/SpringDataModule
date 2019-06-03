@@ -1,32 +1,60 @@
 package com.iti.spring.hibernate.main;
 
-import com.iti.spring.generic.model.dao.*;
-import com.iti.spring.generic.model.entity.BuyerBuyProductId;
+
 import com.iti.spring.hibernate.cfg.AppConfig;
+import com.iti.spring.hibernate.model.dao.UserDAOSecured;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 
 public class MainHibernate {
+
+    String userName = "mohamed";
+    String password = "123456";
+    ApplicationContext context;
+
+    public MainHibernate() {
+        context = new AnnotationConfigApplicationContext(AppConfig.class);
+        UsernamePasswordAuthenticationToken token = createUsernamePasswordAuthenticationToken(userName, password);
+        Authentication authentication = authenticate(token);
+        setSecurityContext(authentication);
+
+        UserDAOSecured userDAO = context.getBean(UserDAOSecured.class);
+        System.out.println(userDAO.retrieveByUserName("Feras2").getFullName());
+
+    }
+
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        new MainHibernate();
+    }
 
-        UserDAO userDao  = context.getBean("userDAO", UserDAO.class);
+    private UsernamePasswordAuthenticationToken createUsernamePasswordAuthenticationToken(String userName, String password) {
 
-        SellerDAO sellerDAO = context.getBean("getSellerDAO", SellerDAO.class);
+          /*  String roles[] = {"ROLE_USER","ROLE_ADMIN"};
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles.length);
 
-        ProductDAO productDAO = context.getBean(ProductDAO.class);
+        for(String role :roles){
+            grantedAuthorities.add(new SimpleGrantedAuthority(role));
+        }*/
 
-        CategoryDAO categoryDAO = context.getBean(CategoryDAO.class);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
+        return authenticationToken;
+    }
 
-        BuyerDAO buyerDAO = context.getBean(BuyerDAO.class);
+    private Authentication authenticate(UsernamePasswordAuthenticationToken token) {
+        AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
 
-        BuyerBuyProductDAO buyerBuyProductDAO = context.getBean(BuyerBuyProductDAO.class);
+        Authentication authentication = authenticationManager.authenticate(token);
+        return authentication;
+    }
 
-        BuyerBuyProductId buyerBuyProductId = new BuyerBuyProductId();
-        buyerBuyProductId.setBuyerId(1);
-        buyerBuyProductId.setProductId(1);
-
-        System.out.println(buyerBuyProductDAO.retrieveById(buyerBuyProductId).getId().getBuyerId());
-
+    private void setSecurityContext(Authentication authentication) {
+        SecurityContextImpl securityContext = new SecurityContextImpl();
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 }
